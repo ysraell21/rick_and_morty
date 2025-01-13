@@ -94,7 +94,7 @@ const CardStacker: React.FC = () => {
       </div>
 
       {/* Pagination Buttons */}
-      <div className="fixed bottom-4 right-4 flex justify-end space-x-4 hidden md:flex">
+      <div className="fixed bottom-4 right-4 justify-end space-x-4 hidden md:flex">
         {currentPage > 0 && (
           <button
             className="py-2 px-4 border border-blue-500 text-blue-500 rounded hover:bg-gray-700 hover:text-white"
