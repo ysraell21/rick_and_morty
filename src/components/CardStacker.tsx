@@ -3,13 +3,13 @@ import Card from "./Card";
 import axios from "axios";
 
 const CardStacker: React.FC = () => {
-  const [allData, setAllData] = useState<Array<Record<string, any>>>([]); 
-
+  const [allData, setAllData] = useState<Array<Record<string, any>>>([]);
   const [displayData, setDisplayData] = useState<Array<Record<string, any>>>(
     []
   );
   const [currentPage, setCurrentPage] = useState(0);
-  const limit = 5;
+
+  const limit = 5; // Number of cards per page for web view
 
   const fetchAllData = async () => {
     try {
@@ -29,12 +29,14 @@ const CardStacker: React.FC = () => {
       const combinedData = responses.flatMap(
         (response) => response.data.results
       );
-      const formatCombinedData = (combinedData || [])?.map((item: Record<string, any>)=>{
-        return {
-          ...item,
-          status: item?.status === 'unknown' ? '?' : item?.status
+      const formatCombinedData = (combinedData || [])?.map(
+        (item: Record<string, any>) => {
+          return {
+            ...item,
+            status: item?.status === "unknown" ? "?" : item?.status,
+          };
         }
-      })
+      );
       setAllData(formatCombinedData);
       setDisplayData(formatCombinedData.slice(0, limit));
     } catch (error) {
@@ -63,12 +65,21 @@ const CardStacker: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="py-10 flex flex-col">
-        <div className="flex space-x-4">
-          {displayData.map((item: Record<string, any>) => (
+    <div className="py-10 flex flex-col items-center overflow-auto h-screen">
+      {/* Responsive Card Layout for iPad Mini */}
+      <div
+        className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-5 md:grid-rows-3 w-full px-4"
+        style={{
+          gridTemplateRows: "1fr 1fr 1fr", // Makes sure it splits into 3 rows
+          gridTemplateColumns: "repeat(2, 1fr)", // 2 columns for the iPad Mini layout
+        }}
+      >
+        {displayData.map((item: Record<string, any>, index) => (
+          <div
+            key={item.id}
+            className={`flex justify-center ${index === 4 ? "col-span-2" : ""}`} // Ensures the last card spans two columns
+          >
             <Card
-              key={item.id}
               name={item.name}
               status={item.status}
               species={item.species}
@@ -78,10 +89,12 @@ const CardStacker: React.FC = () => {
               origin={item.origin}
               location={item.location}
             />
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-      <div className="fixed bottom-4 right-4 flex justify-end space-x-4">
+
+      {/* Pagination Buttons */}
+      <div className="fixed bottom-4 right-4 flex justify-end space-x-4 hidden md:flex">
         {currentPage > 0 && (
           <button
             className="py-2 px-4 border border-blue-500 text-blue-500 rounded hover:bg-gray-700 hover:text-white"
@@ -100,7 +113,7 @@ const CardStacker: React.FC = () => {
           </button>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
