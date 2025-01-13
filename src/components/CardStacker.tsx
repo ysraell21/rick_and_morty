@@ -4,7 +4,9 @@ import axios from "axios";
 
 const CardStacker: React.FC = () => {
   const [allData, setAllData] = useState<Array<Record<string, any>>>([]);
-  const [displayData, setDisplayData] = useState<Array<Record<string, any>>>([]);
+  const [displayData, setDisplayData] = useState<Array<Record<string, any>>>(
+    []
+  );
   const [currentPage, setCurrentPage] = useState(0);
 
   const limit = 5; // Number of cards per page for web view
@@ -27,12 +29,14 @@ const CardStacker: React.FC = () => {
       const combinedData = responses.flatMap(
         (response) => response.data.results
       );
-      const formatCombinedData = (combinedData || [])?.map((item: Record<string, any>) => {
-        return {
-          ...item,
-          status: item?.status === "unknown" ? "?" : item?.status,
-        };
-      });
+      const formatCombinedData = (combinedData || [])?.map(
+        (item: Record<string, any>) => {
+          return {
+            ...item,
+            status: item?.status === "unknown" ? "?" : item?.status,
+          };
+        }
+      );
       setAllData(formatCombinedData);
       setDisplayData(formatCombinedData.slice(0, limit));
     } catch (error) {
@@ -83,31 +87,57 @@ const CardStacker: React.FC = () => {
       </div>
 
       {/* Pagination Buttons */}
-      <div className="fixed bottom-4 right-4 flex justify-end space-x-4">
-        {currentPage > 0 && (
-          <button
-            className="py-2 px-4 border border-blue-500 text-blue-500 rounded hover:bg-gray-700 hover:text-white"
-            onClick={handlePrev}
-          >
-            Previous
-          </button>
-        )}
+      <div className="fixed bottom-4 left-0 right-0 flex justify-between px-4">
+        {/* Mobile view buttons */}
+        <div className="sm:hidden flex justify-between w-full">
+          {/* Previous button (left side) */}
+          {currentPage > 0 && (
+            <button
+              className="fixed bottom-4 left-4 py-2 px-4 border border-blue-500 text-blue-500 rounded hover:bg-gray-700 hover:text-white"
+              onClick={handlePrev}
+            >
+              &lt; {/* Previous symbol */}
+            </button>
+          )}
 
-        {(currentPage + 1) * limit < allData.length && (
-          <button
-            className="py-2 px-4 border border-blue-500 text-blue-500 rounded hover:bg-gray-700 hover:text-white"
-            onClick={handleNext}
-          >
-            Next
-          </button>
-        )}
+          {/* Next button (right side by default) */}
+          {(currentPage + 1) * limit < allData.length && (
+            <button
+              className="fixed bottom-4 right-4 py-2 px-4 border border-blue-500 text-blue-500 rounded hover:bg-gray-700 hover:text-white"
+              onClick={handleNext}
+            >
+              &gt; {/* Next symbol */}
+            </button>
+          )}
+        </div>
+
+        {/* Web view buttons */}
+        <div className="hidden sm:flex justify-end space-x-4 w-full">
+          {currentPage > 0 && (
+            <button
+              className="py-2 px-4 border border-blue-500 text-blue-500 rounded hover:bg-gray-700 hover:text-white"
+              onClick={handlePrev}
+            >
+              Previous
+            </button>
+          )}
+
+          {/* Only show Next button if there is more data */}
+          {(currentPage + 1) * limit < allData.length && (
+            <button
+              className="py-2 px-4 border border-blue-500 text-blue-500 rounded hover:bg-gray-700 hover:text-white"
+              onClick={handleNext}
+            >
+              Next
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
 export default CardStacker;
-
 
 // return (
 //   <>
